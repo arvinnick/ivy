@@ -395,8 +395,11 @@ def fomaml_step(
     return_inner_v: Union[str, bool] = False,
     num_tasks: Optional[int] = None,
     stop_gradients: bool = True,
-) -> Tuple[ivy.Array, ivy.Container, Any]:
-    """Perform step of first order MAML.
+) -> Union[ivy.Array, ivy.Container]:
+    #todo: issue #2142
+    """
+
+    Perform step of first order MAML.
 
     Parameters
     ----------
@@ -457,6 +460,35 @@ def fomaml_step(
     ret
         The cost and the gradients with respect to the outer loop variables.
 
+
+
+    Examples
+    --------
+    ivy.fomaml_step(average_across_steps=,
+                    batch=,
+                    batched=,
+                    inner_batch_fn=,
+                    inner_cost_fn=,
+                    inner_grad_steps=,
+                    inner_learning_rate=,
+                    inner_optimization_step=,
+                    inner_v=,
+                    keep_inner_v=,
+                    keep_outer_v=,
+                    num_tasks=,
+                    outer_batch_fn=,
+                    outer_cost_fn=,
+                    outer_v=,
+                    return_inner_v=,
+                    stop_gradients=,
+                    variables=,
+
+
+
+
+    This function conforms to the `Ivy API Standard <https://data-apis.org/arrahttps://lets-unify.ai/ivy/deep_dive/10_docstrings.html>`_.
+
+
     """
     if num_tasks is None:
         num_tasks = batch.shape[0]
@@ -486,8 +518,10 @@ def fomaml_step(
         cost = ivy.stop_gradient(cost, preserve_type=False)
     grads = rets[1]
     if return_inner_v:
-        return cost, grads, rets[2]
-    return cost, grads
+        ret = ivy.Array([cost, grads, rets[2]])
+        return ret
+    ret = ivy.Array([cost, grads])
+    return ret
 
 
 @to_native_arrays_and_back
